@@ -1,0 +1,8 @@
+# Aktifkan mesin rewrite URL
+RewriteEngine On
+
+# Aturan: Jika ada permintaan ke "api/data",
+# jalankan file "api.php" sebagai gantinya.
+# [NC] = No Case (tidak peduli huruf besar/kecil)
+# [L] = Last Rule (jika aturan ini cocok, berhenti memproses aturan lain)
+RewriteRule ^api/data$ api.php [NC,L]
