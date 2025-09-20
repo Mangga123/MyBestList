@@ -1,0 +1,12 @@
+{
+  "jadwal": [
+    ["Pemrograman Web Lanjut", "Senin", "08:00", "Lab Komputer 1", "Dr. Budi Santoso", "3"],
+    ["Basis Data", "Selasa", "10:30", "Ruang Teori 5", "Prof. Indah Lestari", "3"],
+    ["Kecerdasan Buatan", "Rabu", "13:00", "Auditorium", "Dr. Rahmat Hidayat", "4"]
+  ],
+  "tugas": [
+    ["Membuat CRUD dengan PHP", "2025-10-15", false],
+    ["Rangkuman Jurnal AI", "2025-10-22", true],
+    ["Desain ERD Toko Online", "2025-11-01", false]
+  ]
+}
