@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Agenda Digital</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+      body {
+        background: #f4f6f9;
+        color: #333;
+        padding: 15px;
+      }
+      h1,
+      h2 {
+        text-align: center;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+      .container {
+        max-width: 1200px;
+        margin: auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+      }
+      .card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 15px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      }
+      label {
+        font-weight: 600;
+        display: block;
+        margin-top: 10px;
+      }
+      input,
+      select {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        outline: none;
+        transition: border 0.2s;
+        font-size: 14px;
+      }
+      input:focus,
+      select:focus {
+        border-color: #3498db;
+      }
+      button {
+        margin-top: 12px;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 8px;
+        background: #3498db;
+        color: white;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+        font-size: 14px;
+      }
+      button:hover {
+        background: #2980b9;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+        font-size: 14px;
+      }
+      th,
+      td {
+        padding: 10px;
+        text-align: center;
+        border-bottom: 1px solid #eee;
+      }
+      th {
+        background: #3498db;
+        color: white;
+      }
+      .done {
+        text-decoration: line-through;
+        color: gray;
+      }
+      .btn-danger {
+        background: #e74c3c;
+      }
+      .btn-danger:hover {
+        background: #c0392b;
+      }
+      .btn-reset {
+        background: #f39c12;
+      }
+      .btn-reset:hover {
+        background: #d35400;
+      }
+      .sks-info {
+        margin-top: 10px;
+        font-weight: 600;
+        color: #27ae60;
+      }
+      @media (max-width: 900px) {
+        .container {
+          grid-template-columns: 1fr;
+        }
+        body {
+          padding: 10px;
+        }
+        h1 {
+          font-size: 20px;
+        }
+        h2 {
+          font-size: 16px;
+        }
+        table {
+          display: block;
+          overflow-x: auto;
+          white-space: nowrap;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>📅 Agenda Digital</h1>
+    <div class="container">
+      <!-- Input Jadwal -->
+      <div class="card">
+        <h2>Tambah Jadwal</h2>
+        <label>Mata Kuliah</label>
+        <input type="text" id="matkul" />
+        <label>Hari</label>
+        <select id="hari">
+          <option>Senin</option>
+          <option>Selasa</option>
+          <option>Rabu</option>
+          <option>Kamis</option>
+          <option>Jumat</option>
+          <option>Sabtu</option>
+        </select>
+        <label>Jam</label>
+        <input type="time" id="jam" />
+        <label>Ruang</label>
+        <input type="text" id="ruang" />
+        <label>Dosen</label>
+        <input type="text" id="dosen" />
+        <label>SKS</label>
+        <input type="number" id="sks" min="1" max="6" />
+        <button onclick="tambahJadwal()">+ Tambah Jadwal</button>
+        <button class="btn-reset" onclick="resetSKS()">🔄 Reset SKS</button>
+        <button class="btn-reset" onclick="resetTugas()">🧹 Reset Tugas</button>
+        <div class="sks-info">Total SKS: <span id="totalSKS">0</span></div>
+      </div>
+
+      <!-- Input Tugas -->
+      <div class="card">
+        <h2>Tambah Tugas</h2>
+        <label>Nama Tugas</label>
+        <input type="text" id="tugas" />
+        <label>Deadline</label>
+        <input type="date" id="deadline" />
+        <button onclick="tambahTugas()">+ Tambah Tugas</button>
+      </div>
+    </div>
+
+    <!-- Daftar Jadwal -->
+    <div class="card" style="margin-top: 20px">
+      <h2>📚 Jadwal Kuliah</h2>
+      <table id="jadwalTable">
+        <thead>
+          <tr>
+            <th>Mata Kuliah</th>
+            <th>Hari</th>
+            <th>Jam</th>
+            <th>Ruang</th>
+            <th>Dosen</th>
+            <th>SKS</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Daftar Tugas -->
+    <div class="card" style="margin-top: 20px">
+      <h2>📝 Daftar Tugas</h2>
+      <table id="tugasTable">
+        <thead>
+          <tr>
+            <th>Tugas</th>
+            <th>Deadline</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <script>
+      let jadwal = [];
+      let tugas = [];
+
+      async function loadData() {
+        try {
+          const res = await fetch("/api/data");
+          const data = await res.json();
+          jadwal = data.jadwal || [];
+          tugas = data.tugas || [];
+          tampilkan();
+        } catch (error) {
+          console.error("Gagal memuat data:", error);
+        }
+      }
+
+      async function saveData() {
+        try {
+          await fetch("/api/data", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ jadwal, tugas }),
+          });
+        } catch (error) {
+          console.error("Gagal menyimpan data:", error);
+        }
+      }
+
+      function tampilkan() {
+        const jadwalTableBody = document.querySelector("#jadwalTable tbody");
+        jadwalTableBody.innerHTML = "";
+        let total = 0;
+        jadwal.forEach((j) => {
+          let row = jadwalTableBody.insertRow();
+          j.forEach((val) => {
+            let cell = row.insertCell();
+            cell.innerText = val;
+          });
+          total += parseInt(j[5]) || 0;
+        });
+        document.getElementById("totalSKS").innerText = total;
+
+        const tugasTableBody = document.querySelector("#tugasTable tbody");
+        tugasTableBody.innerHTML = "";
+        tugas.forEach((t, idx) => {
+          let row = tugasTableBody.insertRow();
+          row.insertCell().innerText = t[0];
+          row.insertCell().innerText = t[1];
+          let cell = row.insertCell();
+          if (t[2]) {
+            cell.innerHTML = `<span class="done">Selesai</span>`;
+          } else {
+            cell.innerHTML = `<button class="btn-danger" onclick="selesaikanTugas(${idx})">Selesai</button>`;
+          }
+        });
+      }
+
+      function tambahJadwal() {
+        const matkul = document.getElementById("matkul").value.trim();
+        const hari = document.getElementById("hari").value;
+        const jam = document.getElementById("jam").value;
+        const ruang = document.getElementById("ruang").value.trim();
+        const dosen = document.getElementById("dosen").value.trim();
+        const sks = document.getElementById("sks").value;
+        if (matkul && jam && ruang && dosen && sks) {
+          jadwal.push([matkul, hari, jam, ruang, dosen, sks]);
+          saveData();
+          tampilkan();
+          // Kosongkan form
+          document.getElementById("matkul").value = "";
+          document.getElementById("jam").value = "";
+          document.getElementById("ruang").value = "";
+          document.getElementById("dosen").value = "";
+          document.getElementById("sks").value = "";
+        } else {
+          alert("Harap isi semua kolom jadwal!");
+        }
+      }
+
+      function tambahTugas() {
+        const nama = document.getElementById("tugas").value.trim();
+        const deadline = document.getElementById("deadline").value;
+        if (nama && deadline) {
+          tugas.push([nama, deadline, false]);
+          saveData();
+          tampilkan();
+          // Kosongkan form
+          document.getElementById("tugas").value = "";
+          document.getElementById("deadline").value = "";
+        } else {
+          alert("Harap isi nama tugas dan deadline!");
+        }
+      }
+
+      function selesaikanTugas(i) {
+        tugas[i][2] = true;
+        saveData();
+        tampilkan();
+      }
+
+      function resetSKS() {
+        if (confirm("Yakin ingin mengosongkan semua jadwal kuliah?")) {
+          jadwal = [];
+          saveData();
+          tampilkan();
+        }
+      }
+
+      function resetTugas() {
+        if (confirm("Yakin ingin menghapus semua daftar tugas?")) {
+          tugas = [];
+          saveData();
+          tampilkan();
+        }
+      }
+
+      // Muat data saat halaman pertama kali dibuka
+      loadData();
+    </script>
+  </body>
+</html>
